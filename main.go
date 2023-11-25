@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/thoas/go-funk"
 	"os"
 	"strconv"
+	"sync"
 )
 
 const (
@@ -34,9 +36,21 @@ func main() {
 		bord = append(bord, row...)
 	}
 
-	fmt.Println(isVerticalBingo(bord, lines) ||
-		isHorizontalBingo(bord, lines) ||
-		isDiagonalBingo(bord, lines))
+	var wg sync.WaitGroup
+	var result bool
+	wg.Add(3)
+
+	commonFn := func(fn func([]string, int) bool) {
+		defer wg.Done()
+		result = result || fn(bord, lines)
+	}
+
+	go commonFn(isVerticalBingo)
+	go commonFn(isHorizontalBingo)
+	go commonFn(isDiagonalBingo)
+
+	wg.Wait()
+	fmt.Println(result)
 }
 
 func makeRow(inputRow string) []string {
@@ -73,16 +87,9 @@ func isVerticalBingo(bord []string, lines int) bool {
 func isHorizontalBingo(bord []string, lines int) bool {
 	for rowNo := 0; rowNo < lines; rowNo++ {
 		firstColumnNo := lines * rowNo
-		result := true
-		for columnNo := 0; columnNo < lines; columnNo++ {
-			if columnNo == 0 {
-				continue
-			}
-			if bord[firstColumnNo] != bord[(firstColumnNo)+columnNo] {
-				result = false
-			}
-		}
-		if result {
+		if funk.Every(bord[firstColumnNo+1:firstColumnNo+lines+1], func(cell string) bool {
+			return bord[firstColumnNo] == cell
+		}) {
 			return true
 		}
 	}
