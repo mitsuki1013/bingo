@@ -22,22 +22,22 @@ func TestBingo(t *testing.T) {
 		want string
 	}{
 		{
-			name: "0/ゲームとして成立しない",
+			name: "0/一致",
 			in:   "0\n",
-			want: "NO",
+			want: "Yes",
 		},
 		{
-			name: "1/ゲームとして成立しない",
+			name: "1/一致",
 			in: "1\n" +
 				"o\n",
-			want: "NO",
+			want: "Yes",
 		},
 		{
-			name: "2/100%trueになるためゲームとして成立しない",
+			name: "2/横一致",
 			in: "2\n" +
 				"oo\n" +
 				"xx\n",
-			want: "NO",
+			want: "Yes",
 		},
 		{
 			name: "3/横一致",
@@ -45,7 +45,7 @@ func TestBingo(t *testing.T) {
 				"ooo\n" +
 				"oxx\n" +
 				"xox\n",
-			want: "YES",
+			want: "Yes",
 		},
 		{
 			name: "3/縦一致",
@@ -53,7 +53,7 @@ func TestBingo(t *testing.T) {
 				"xoo\n" +
 				"oox\n" +
 				"xox\n",
-			want: "YES",
+			want: "Yes",
 		},
 		{
 			name: "3/右下がり斜め一致",
@@ -61,7 +61,7 @@ func TestBingo(t *testing.T) {
 				"oox\n" +
 				"oox\n" +
 				"xoo\n",
-			want: "YES",
+			want: "Yes",
 		},
 		{
 			name: "3/左下がり斜め一致",
@@ -69,7 +69,7 @@ func TestBingo(t *testing.T) {
 				"oxo\n" +
 				"xox\n" +
 				"oox\n",
-			want: "YES",
+			want: "Yes",
 		},
 		{
 			name: "3/不一致",
@@ -77,7 +77,17 @@ func TestBingo(t *testing.T) {
 				"oxo\n" +
 				"xox\n" +
 				"xox\n",
-			want: "NO",
+			want: "No",
+		},
+		{
+			name: "5/不一致",
+			in: "5\n" +
+				"xoooo\n" +
+				"oxooo\n" +
+				"ooxoo\n" +
+				"oooxo\n" +
+				"oooox\n",
+			want: "No",
 		},
 	}
 

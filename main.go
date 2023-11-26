@@ -19,9 +19,9 @@ func main() {
 
 func Bingo() string {
 	bord, lines := makeBord()
-	if lines == 0 || lines == 1 || lines == 2 {
-		return "NO"
-	}
+	// if lines == 0 || lines == 1 || lines == 2 {
+	// 	return "NO"
+	// }
 
 	var mu sync.Mutex
 	var wg sync.WaitGroup
@@ -43,9 +43,9 @@ func Bingo() string {
 
 	wg.Wait()
 	if result {
-		return "YES"
+		return "Yes"
 	}
-	return "NO"
+	return "No"
 }
 
 func makeBord() ([]string, int) {
@@ -89,6 +89,10 @@ func isVerticalBingo(bord []string, lines int) bool {
 	for columnNo := 0; columnNo < lines; columnNo++ {
 		upperColumn := bord[columnNo]
 		result := true
+		if upperColumn == x {
+			result = false
+			continue
+		}
 		for rowNo := 0; rowNo < lines; rowNo++ {
 			if rowNo == 0 {
 				continue
@@ -107,7 +111,16 @@ func isVerticalBingo(bord []string, lines int) bool {
 func isHorizontalBingo(bord []string, lines int) bool {
 	for rowNo := 0; rowNo < lines; rowNo++ {
 		firstColumnNo := lines * rowNo
-		if strEvery(bord[firstColumnNo+1:firstColumnNo+lines+1], func(cell string) bool {
+		lastColumnNo := firstColumnNo + lines
+		if bord[firstColumnNo] == x {
+			continue
+		}
+		if lines == 1 {
+			return true
+		}
+		ts := bord[firstColumnNo+1 : lastColumnNo]
+		//fmt.Println(ts)
+		if strEvery(ts, func(cell string) bool {
 			return bord[firstColumnNo] == cell
 		}) {
 			return true
@@ -128,6 +141,10 @@ func strEvery(list []string, fn func(string) bool) bool {
 func isDiagonalBingo(bord []string, lines int) bool {
 	downRightResult := true
 	downLeftResult := true
+
+	if lines == 1 && bord[0] == x {
+		return false
+	}
 	for rowNo := 0; rowNo < lines; rowNo++ {
 		upperLastIndex := lines - 1
 		firstUpperColumn := bord[0]
@@ -135,10 +152,10 @@ func isDiagonalBingo(bord []string, lines int) bool {
 		if rowNo == 0 {
 			continue
 		}
-		if firstUpperColumn != bord[(lines+1)*rowNo] {
+		if firstUpperColumn == x || firstUpperColumn != bord[(lines+1)*rowNo] {
 			downRightResult = false
 		}
-		if lastUpperColumn != bord[upperLastIndex+(rowNo*upperLastIndex)] {
+		if lastUpperColumn == x || lastUpperColumn != bord[upperLastIndex+(rowNo*upperLastIndex)] {
 			downLeftResult = false
 		}
 	}
