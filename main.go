@@ -15,6 +15,35 @@ const (
 )
 
 func main() {
+	Bingo()
+}
+
+func Bingo() {
+	bord, lines := makeBord()
+
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	var result bool
+	wg.Add(3)
+
+	commonFn := func(fn func([]string, int) bool) {
+		defer wg.Done()
+		if found := fn(bord, lines); found {
+			mu.Lock()
+			result = true
+			mu.Unlock()
+		}
+	}
+
+	go commonFn(isVerticalBingo)
+	go commonFn(isHorizontalBingo)
+	go commonFn(isDiagonalBingo)
+
+	wg.Wait()
+	fmt.Println(result)
+}
+
+func makeBord() ([]string, int) {
 	scanner := bufio.NewScanner(os.Stdin)
 	var bord []string
 
@@ -36,21 +65,7 @@ func main() {
 		bord = append(bord, row...)
 	}
 
-	var wg sync.WaitGroup
-	var result bool
-	wg.Add(3)
-
-	commonFn := func(fn func([]string, int) bool) {
-		defer wg.Done()
-		result = result || fn(bord, lines)
-	}
-
-	go commonFn(isVerticalBingo)
-	go commonFn(isHorizontalBingo)
-	go commonFn(isDiagonalBingo)
-
-	wg.Wait()
-	fmt.Println(result)
+	return bord, lines
 }
 
 func makeRow(inputRow string) []string {
