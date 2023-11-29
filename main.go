@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	o = "o"
-	x = "x"
+	CIRCLE = "o"
+	CROSS  = "x"
 )
 
 func main() {
@@ -19,14 +19,15 @@ func main() {
 
 func Bingo() string {
 	bord, lines := makeBord()
-	// if lines == 0 || lines == 1 || lines == 2 {
-	// 	return "NO"
-	// }
+	if lines == 0 {
+		// 0の場合は無条件Yesという仕様
+		return "Yes"
+	}
 
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	var result bool
-	wg.Add(3)
+	wg.Add(4)
 
 	commonFn := func(fn func([]string, int) bool) {
 		defer wg.Done()
@@ -39,7 +40,8 @@ func Bingo() string {
 
 	go commonFn(isVerticalBingo)
 	go commonFn(isHorizontalBingo)
-	go commonFn(isDiagonalBingo)
+	go commonFn(isBottomRight)
+	go commonFn(isBottomLeft)
 
 	wg.Wait()
 	if result {
@@ -77,56 +79,70 @@ func makeRow(inputRow string) []string {
 	var row []string
 	for _, char := range inputRow {
 		cell := string(char)
-		if cell != o && cell != x {
-			panic(`Invalid input: Please enter either "o" or "x".`)
+		if cell != CIRCLE && cell != CROSS {
+			panic(fmt.Sprintf("Invalid input: Please enter either %s or %s.", CIRCLE, CROSS))
 		}
 		row = append(row, cell)
 	}
 	return row
 }
 
-func isVerticalBingo(bord []string, lines int) bool {
-	for columnNo := 0; columnNo < lines; columnNo++ {
-		upperColumn := bord[columnNo]
-		result := true
-		if upperColumn == x {
-			result = false
-			continue
-		}
-		for rowNo := 0; rowNo < lines; rowNo++ {
-			if rowNo == 0 {
-				continue
-			}
-			if upperColumn != bord[(lines*rowNo)+columnNo] {
-				result = false
-			}
-		}
-		if result {
+func isVerticalBingo(bord []string, n int) bool {
+	for line := 0; line < n; line++ {
+		if strEvery(bordFilter(bord, func(i int) bool {
+			return (i+n)%n == line
+		}), func(s string) bool {
+			return s == CIRCLE
+		}) {
 			return true
 		}
 	}
 	return false
 }
 
-func isHorizontalBingo(bord []string, lines int) bool {
-	for rowNo := 0; rowNo < lines; rowNo++ {
-		firstColumnNo := lines * rowNo
-		lastColumnNo := firstColumnNo + lines
-		if bord[firstColumnNo] == x {
-			continue
-		}
-		if lines == 1 {
-			return true
-		}
-		ts := bord[firstColumnNo+1 : lastColumnNo]
-		//fmt.Println(ts)
-		if strEvery(ts, func(cell string) bool {
-			return bord[firstColumnNo] == cell
+func isHorizontalBingo(bord []string, n int) bool {
+	for line := 0; line < n; line++ {
+		if strEvery(bordFilter(bord, func(i int) bool {
+			return (n*line)-1 < i && i < (n*(line+1))
+		}), func(s string) bool {
+			return s == CIRCLE
 		}) {
 			return true
 		}
 	}
 	return false
+}
+
+func isBottomRight(bord []string, n int) bool {
+	return strEvery(bordFilter(bord, func(i int) bool {
+		if i == 0 {
+			return true
+		}
+		return i%(n+1) == 0
+	}), func(s string) bool {
+		return s == CIRCLE
+	})
+}
+
+func isBottomLeft(bord []string, n int) bool {
+	return strEvery(bordFilter(bord, func(i int) bool {
+		if i == 0 || i == (n*n)-1 {
+			return false
+		}
+		return i%(n-1) == 0
+	}), func(s string) bool {
+		return s == CIRCLE
+	})
+}
+
+func bordFilter(list []string, fn func(int) bool) []string {
+	result := []string{}
+	for i, s := range list {
+		if fn(i) {
+			result = append(result, s)
+		}
+	}
+	return result
 }
 
 func strEvery(list []string, fn func(string) bool) bool {
@@ -136,28 +152,4 @@ func strEvery(list []string, fn func(string) bool) bool {
 		}
 	}
 	return true
-}
-
-func isDiagonalBingo(bord []string, lines int) bool {
-	downRightResult := true
-	downLeftResult := true
-
-	if lines == 1 && bord[0] == x {
-		return false
-	}
-	for rowNo := 0; rowNo < lines; rowNo++ {
-		upperLastIndex := lines - 1
-		firstUpperColumn := bord[0]
-		lastUpperColumn := bord[upperLastIndex]
-		if rowNo == 0 {
-			continue
-		}
-		if firstUpperColumn == x || firstUpperColumn != bord[(lines+1)*rowNo] {
-			downRightResult = false
-		}
-		if lastUpperColumn == x || lastUpperColumn != bord[upperLastIndex+(rowNo*upperLastIndex)] {
-			downLeftResult = false
-		}
-	}
-	return downRightResult || downLeftResult
 }
