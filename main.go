@@ -87,6 +87,10 @@ func makeRow(inputRow string) []string {
 	return row
 }
 
+/*
+isVerticalBingo
+縦列が一つでも一致すればtrueを返す
+*/
 func isVerticalBingo(bord []string, n int) bool {
 	for line := 0; line < n; line++ {
 		if strEvery(bordFilter(bord, func(i int) bool {
@@ -100,6 +104,10 @@ func isVerticalBingo(bord []string, n int) bool {
 	return false
 }
 
+/*
+isHorizontalBingo
+横列が一つでも一致すればtrueを返す
+*/
 func isHorizontalBingo(bord []string, n int) bool {
 	for line := 0; line < n; line++ {
 		if strEvery(bordFilter(bord, func(i int) bool {
@@ -113,6 +121,10 @@ func isHorizontalBingo(bord []string, n int) bool {
 	return false
 }
 
+/*
+isBottomRight
+右下がり斜めが一致すればtrueを返す
+*/
 func isBottomRight(bord []string, n int) bool {
 	return strEvery(bordFilter(bord, func(i int) bool {
 		if i == 0 {
@@ -124,6 +136,10 @@ func isBottomRight(bord []string, n int) bool {
 	})
 }
 
+/*
+isBottomLeft
+左下り斜めが一致すればtrueを返す
+*/
 func isBottomLeft(bord []string, n int) bool {
 	return strEvery(bordFilter(bord, func(i int) bool {
 		if i == 0 || i == (n*n)-1 {
@@ -135,6 +151,17 @@ func isBottomLeft(bord []string, n int) bool {
 	})
 }
 
+/*
+bordFilter
+縦、横、斜めそれぞれの列を抽出するための抽象関数
+第一引数の 'list' の各要素に対して第二引数の関数（fn）を適用する。
+また、第二引数は、第一引数のlistの各要素のindexを引数にとる。
+
+ex.
+1st ["1", "2", "3"]
+2nd func(i int) bool { return i != 2 }
+return ["1", "3"]
+*/
 func bordFilter(list []string, fn func(int) bool) []string {
 	result := []string{}
 	for i, s := range list {
@@ -145,6 +172,21 @@ func bordFilter(list []string, fn func(int) bool) []string {
 	return result
 }
 
+/*
+strEvery
+第一引数（[]string）の各要素に対し、第二引数の関数で評価をした結果、
+全てがtrueであればtrueを返し、一つでもfalseがあればfalseを返す。
+
+ex.
+1st ["o", "x", "o"]
+2nd func(s string) bool { return s === "o" }
+return false
+
+ex.
+1st ["o", "o", "o"]
+2nd func(s string) bool { return s === "o" }
+return true
+*/
 func strEvery(list []string, fn func(string) bool) bool {
 	for _, ele := range list {
 		if !fn(ele) {

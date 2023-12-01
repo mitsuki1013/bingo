@@ -33,6 +33,12 @@ func TestBingo(t *testing.T) {
 			want: "Yes",
 		},
 		{
+			name: "1/不一致",
+			in: "1\n" +
+				"x\n",
+			want: "No",
+		},
+		{
 			name: "2/横一致",
 			in: "2\n" +
 				"oo\n" +
@@ -97,13 +103,11 @@ func TestBingo(t *testing.T) {
 
 			if n, err := os.Stdout.Write(input); err != nil {
 				t.Errorf("input is %v bytes, but only %v byte written", len(input), n)
-				return
 			}
 
 			got := Bingo()
 			if got != c.want {
 				t.Errorf("failed: expected %v, got %v", c.want, got)
-				return
 			}
 		})
 	}
