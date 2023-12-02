@@ -91,10 +91,10 @@ func makeRow(inputRow string) []string {
 isVerticalBingo
 縦列が一つでも一致すればtrueを返す
 */
-func isVerticalBingo(bord []string, n int) bool {
-	for line := 0; line < n; line++ {
-		if strEvery(bordFilter(bord, func(i int) bool {
-			return (i+n)%n == line
+func isVerticalBingo(bord []string, lines int) bool {
+	for i := 0; i < lines; i++ {
+		if strEvery(bordFilter(bord, func(index int) bool {
+			return (index+lines)%lines == i
 		}), func(s string) bool {
 			return s == CIRCLE
 		}) {
@@ -108,10 +108,10 @@ func isVerticalBingo(bord []string, n int) bool {
 isHorizontalBingo
 横列が一つでも一致すればtrueを返す
 */
-func isHorizontalBingo(bord []string, n int) bool {
-	for line := 0; line < n; line++ {
-		if strEvery(bordFilter(bord, func(i int) bool {
-			return (n*line)-1 < i && i < (n*(line+1))
+func isHorizontalBingo(bord []string, lines int) bool {
+	for i := 0; i < lines; i++ {
+		if strEvery(bordFilter(bord, func(index int) bool {
+			return (lines*i)-1 < index && index < (lines*(i+1))
 		}), func(s string) bool {
 			return s == CIRCLE
 		}) {
@@ -125,15 +125,13 @@ func isHorizontalBingo(bord []string, n int) bool {
 isBottomRight
 右下がり斜めが一致すればtrueを返す
 */
-func isBottomRight(bord []string, n int) bool {
-	list := bordFilter(bord, func(i int) bool {
-		if i == 0 {
+func isBottomRight(bord []string, lines int) bool {
+	return strEvery(bordFilter(bord, func(index int) bool {
+		if index == 0 {
 			return true
 		}
-		return i%(n+1) == 0
-	})
-
-	return strEvery(list, func(s string) bool {
+		return index%(lines+1) == 0
+	}), func(s string) bool {
 		return s == CIRCLE
 	})
 }
@@ -142,15 +140,13 @@ func isBottomRight(bord []string, n int) bool {
 isBottomLeft
 左下り斜めが一致すればtrueを返す
 */
-func isBottomLeft(bord []string, n int) bool {
-	list := bordFilter(bord, func(i int) bool {
-		if i == 0 || i == (n*n)-1 {
+func isBottomLeft(bord []string, lines int) bool {
+	return strEvery(bordFilter(bord, func(index int) bool {
+		if index == 0 || index == (lines*lines)-1 {
 			return false
 		}
-		return i%(n-1) == 0
-	})
-
-	return strEvery(list, func(s string) bool {
+		return index%(lines-1) == 0
+	}), func(s string) bool {
 		return s == CIRCLE
 	})
 }
@@ -203,8 +199,8 @@ ex.
 return true
 */
 func strEvery(list []string, fn func(string) bool) bool {
-	for _, ele := range list {
-		if !fn(ele) {
+	for _, s := range list {
+		if !fn(s) {
 			return false
 		}
 	}
