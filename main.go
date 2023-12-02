@@ -156,7 +156,7 @@ bordFilter
 縦、横、斜めそれぞれの列を抽出するための抽象関数
 */
 func bordFilter(bord []string, fn func(int) bool) []string {
-	// 1マスのビンゴの場合、縦、横、斜めの全てに置いて条件を満たすため早期リターン
+	// 1マスのビンゴの場合、縦、横、斜めの全てにおいて条件を満たすため早期リターン
 	if len(bord) == 1 {
 		return bord
 	}
