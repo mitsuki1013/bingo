@@ -126,12 +126,14 @@ isBottomRight
 右下がり斜めが一致すればtrueを返す
 */
 func isBottomRight(bord []string, n int) bool {
-	return strEvery(bordFilter(bord, func(i int) bool {
+	list := bordFilter(bord, func(i int) bool {
 		if i == 0 {
 			return true
 		}
 		return i%(n+1) == 0
-	}), func(s string) bool {
+	})
+
+	return strEvery(list, func(s string) bool {
 		return s == CIRCLE
 	})
 }
@@ -141,12 +143,14 @@ isBottomLeft
 左下り斜めが一致すればtrueを返す
 */
 func isBottomLeft(bord []string, n int) bool {
-	return strEvery(bordFilter(bord, func(i int) bool {
+	list := bordFilter(bord, func(i int) bool {
 		if i == 0 || i == (n*n)-1 {
 			return false
 		}
 		return i%(n-1) == 0
-	}), func(s string) bool {
+	})
+
+	return strEvery(list, func(s string) bool {
 		return s == CIRCLE
 	})
 }
@@ -154,15 +158,26 @@ func isBottomLeft(bord []string, n int) bool {
 /*
 bordFilter
 縦、横、斜めそれぞれの列を抽出するための抽象関数
+*/
+func bordFilter(bord []string, fn func(int) bool) []string {
+	// 1マスのビンゴの場合、縦、横、斜めの全てに置いて条件を満たすため早期リターン
+	if len(bord) == 1 {
+		return bord
+	}
+	return filterStrSliceByIndex(bord, fn)
+}
+
+/*
+filterStrSliceByIndex
 第一引数の 'list' の各要素に対して第二引数の関数（fn）を適用する。
-また、第二引数は、第一引数のlistの各要素のindexを引数にとる。
+また、第二引数の関数は、第一引数の 'list' の各要素のindexを引数にとる。
 
 ex.
 1st ["1", "2", "3"]
 2nd func(i int) bool { return i != 2 }
 return ["1", "3"]
 */
-func bordFilter(list []string, fn func(int) bool) []string {
+func filterStrSliceByIndex(list []string, fn func(int) bool) []string {
 	result := []string{}
 	for i, s := range list {
 		if fn(i) {
