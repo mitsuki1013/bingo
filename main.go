@@ -92,7 +92,7 @@ isVerticalBingo
 縦列が一つでも一致すればtrueを返す
 */
 func isVerticalBingo(bord []string, lines int) bool {
-	for i := 0; i < lines; i++ {
+	for i := 0; i < 3; i++ {
 		if strEvery(bordFilter(bord, func(index int) bool {
 			return (index+lines)%lines == i
 		}), func(s string) bool {
