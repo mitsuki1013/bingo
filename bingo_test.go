@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestBingo(t *testing.T) {
+func TestBingoSample(t *testing.T) {
 	r, w, err := os.Pipe()
 	if err != nil {
 		t.Fatalf("os.Pipe(): %v", err)
